@@ -1,4 +1,6 @@
 import type { ObjectId } from "mongodb";
+import type { BinaryFiles, AppState } from "@excalidraw/excalidraw/types";
+import type { NonDeletedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 
 export const CANVAS_COLLECTION = "canvas";
 
@@ -7,7 +9,11 @@ export type CanvasDocument = {
     lastModifiedAt: Date;
     ownerId: ObjectId;
     sharedWithIds: ObjectId[];
-    data: Record<string, unknown> | null;
+    data: {
+        elements: NonDeletedExcalidrawElement[];
+        appState: AppState;
+        files: BinaryFiles;
+    } | null;
 };
 
 export const USER_COLLECTION = "user";

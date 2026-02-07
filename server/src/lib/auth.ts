@@ -1,23 +1,15 @@
-import { betterAuth, type LogLevel as BALogLevel } from "better-auth";
+import { betterAuth } from "better-auth";
 import { genericOAuth } from "better-auth/plugins";
 import { env } from "../env.js";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { db } from "../db/index.js";
-import { logger, type LogLevel } from "./logger.js";
+import { logger } from "./logger.js";
 import { ACCOUNT_COLLECTION, SESSION_COLLECTION, USER_COLLECTION, VERIFICATION_COLLECTION } from "../db/schema.js";
 
 const log = logger({
     name: "better-auth",
     file: "auth.ts",
 });
-
-const levelToLogLevel: Record<BALogLevel, LogLevel> = {
-    debug: "DEBUG",
-    info: "INFO",
-    warn: "WARN",
-    error: "ERROR",
-    success: "INFO",
-};
 
 export const auth = betterAuth({
     appName: "Canvelot",
@@ -71,7 +63,7 @@ export const auth = betterAuth({
     secret: env.AUTH_SECRET,
     logger: {
         log: (level, message, ...args) => {
-            log(levelToLogLevel[level], `${message} ${JSON.stringify(args)}`);
+            log(level, `${message} ${JSON.stringify(args)}`);
         },
     },
     baseURL: env.BASE_URL,

@@ -87,7 +87,7 @@ export function canvasRouter() {
         );
 
         if (error) {
-            log("ERROR", `Failed to fetch canvases: ${JSON.stringify(error)}`);
+            log("error", `Failed to fetch canvases: ${JSON.stringify(error)}`);
             res.status(500).json({ error: "Internal Server Error" });
             return;
         }
@@ -154,7 +154,7 @@ export function canvasRouter() {
         );
 
         if (error) {
-            log("ERROR", `Failed to fetch canvas with ID ${canvasId.toHexString()}: ${JSON.stringify(error)}`);
+            log("error", `Failed to fetch canvas with ID ${canvasId.toHexString()}: ${JSON.stringify(error)}`);
             res.status(500).json({ error: "Internal Server Error" });
             return;
         }
@@ -197,7 +197,7 @@ export function canvasRouter() {
         );
 
         if (error) {
-            log("ERROR", `Failed to create canvas: ${JSON.stringify(error)}`);
+            log("error", `Failed to create canvas: ${JSON.stringify(error)}`);
             res.status(500).json({ error: "Internal Server Error" });
             return;
         }
@@ -241,7 +241,7 @@ export function canvasRouter() {
         );
 
         if (error) {
-            log("ERROR", `Failed to update canvas with ID ${canvas.id.toHexString()}: ${JSON.stringify(error)}`);
+            log("error", `Failed to update canvas with ID ${canvas.id.toHexString()}: ${JSON.stringify(error)}`);
             res.status(500).json({ error: "Internal Server Error" });
             return;
         }
@@ -282,7 +282,7 @@ export function canvasRouter() {
         );
 
         if (error) {
-            log("ERROR", `Failed to update canvas meta with ID ${data.id.toHexString()}: ${JSON.stringify(error)}`);
+            log("error", `Failed to update canvas meta with ID ${data.id.toHexString()}: ${JSON.stringify(error)}`);
             res.status(500).json({ error: "Internal Server Error" });
             return;
         }
@@ -322,7 +322,7 @@ export function canvasRouter() {
         );
 
         if (error) {
-            log("ERROR", `Failed to delete canvas with ID ${canvasId.toHexString()}: ${JSON.stringify(error)}`);
+            log("error", `Failed to delete canvas with ID ${canvasId.toHexString()}: ${JSON.stringify(error)}`);
             res.status(500).json({ error: "Internal Server Error" });
             return;
         }

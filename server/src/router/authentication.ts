@@ -21,7 +21,7 @@ export function authenticationRouter() {
         );
 
         if (error) {
-            log("ERROR", `Failed to log out user: ${JSON.stringify(error)}`);
+            log("error", `Failed to log out user: ${JSON.stringify(error)}`);
             res.status(500).json({ error: "Internal Server Error" });
             return;
         }

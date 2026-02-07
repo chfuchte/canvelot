@@ -44,5 +44,5 @@ app.use((req, res) => {
 
 const server = createServer(app);
 server.listen(env.PORT, () => {
-    log("INFO", `Server is running on port http://0.0.0.0:${env.PORT}`);
+    log("info", `Server is running on port http://0.0.0.0:${env.PORT}`);
 });

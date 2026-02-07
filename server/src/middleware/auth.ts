@@ -19,6 +19,10 @@ const log = logger({
 });
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
+    if (req.method === "GET" && /^\/?(?:fonts\/.*|assets\/.*|robots\.txt|favicon\.ico|logo.*)$/.test(req.path)) {
+        return next();
+    }
+
     const [session, sessionError] = await tryCatch(
         auth.api.getSession({
             headers: fromNodeHeaders(req.headers),
@@ -26,7 +30,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     );
 
     if (sessionError) {
-        log("ERROR", `Error fetching session: ${JSON.stringify(sessionError)}`);
+        log("error", `Error fetching session: ${JSON.stringify(sessionError)}`);
 
         if (sessionError instanceof APIError) {
             res.status(sessionError.statusCode).send(sessionError.body);
@@ -49,7 +53,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
         );
 
         if (error) {
-            log("ERROR", `Error signing in with OAuth2: ${JSON.stringify(error)}`);
+            log("error", `Error signing in with OAuth2: ${JSON.stringify(error)}`);
             res.status(500).json({ error: "Internal Server Error" });
             return;
         }

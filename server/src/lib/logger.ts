@@ -1,4 +1,4 @@
-export type LogLevel = "DEBUG" | "INFO" | "WARN" | "ERROR";
+export type LogLevel = "debug" | "info" | "warn" | "error";
 
 export function logger(options: { name: string; file?: string }) {
     return (level: LogLevel, message: string) => {

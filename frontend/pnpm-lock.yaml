@@ -31,6 +31,9 @@ importers:
             lucide-react:
                 specifier: ^0.563.0
                 version: 0.563.0(react@19.2.4)
+            pako:
+                specifier: ^2.1.0
+                version: 2.1.0
             radix-ui:
                 specifier: ^1.4.3
                 version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -65,6 +68,9 @@ importers:
             "@types/node":
                 specifier: ^24.10.1
                 version: 24.10.9
+            "@types/pako":
+                specifier: ^2.0.4
+                version: 2.0.4
             "@types/react":
                 specifier: ^19.2.5
                 version: 19.2.10
@@ -2694,6 +2700,12 @@ packages:
                 integrity: sha512-ne4A0IpG3+2ETuREInjPNhUGis1SFjv1d5asp8MzEAGtOZeTeHVDOYqOgqfhvseqg/iXty2hjBf1zAOb7RNiNw==,
             }
 
+    "@types/pako@2.0.4":
+        resolution:
+            {
+                integrity: sha512-VWDCbrLeVXJM9fihYodcLiIv0ku+AlOa/TQ1SvYOaBuyrSKgEcro95LJyIsJ4vSo6BXIxOKxiJAat04CmST9Fw==,
+            }
+
     "@types/react-dom@19.2.3":
         resolution:
             {
@@ -4967,6 +4979,12 @@ packages:
         resolution:
             {
                 integrity: sha512-WjR1hOeg+kki3ZIOjaf4b5WVcay1jaliKSYiEaB1XzwhMQZJxRdQRv0V31EKBYlxb4T7SK3hjfc/jxyU64BoSw==,
+            }
+
+    pako@2.1.0:
+        resolution:
+            {
+                integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==,
             }
 
     parent-module@1.0.1:
@@ -8014,6 +8032,8 @@ snapshots:
         dependencies:
             undici-types: 7.16.0
 
+    "@types/pako@2.0.4": {}
+
     "@types/react-dom@19.2.3(@types/react@19.2.10)":
         dependencies:
             "@types/react": 19.2.10
@@ -9318,6 +9338,8 @@ snapshots:
     package-manager-detector@1.6.0: {}
 
     pako@2.0.3: {}
+
+    pako@2.1.0: {}
 
     parent-module@1.0.1:
         dependencies:

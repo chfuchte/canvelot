@@ -10,6 +10,7 @@ import { logger } from "./lib/logger.js";
 import { authenticationRouter } from "./router/authentication.js";
 import { canvasRouter } from "./router/canvas.js";
 import { userRouter } from "./router/user.js";
+import { gzipMiddleware } from "./middleware/gzip.js";
 
 const log = logger({
     name: "server",
@@ -29,7 +30,8 @@ app.use(
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
-app.use(express.json());
+app.use(gzipMiddleware);
+app.use(express.json({ limit: "25mb" }));
 
 app.use(authMiddleware);
 

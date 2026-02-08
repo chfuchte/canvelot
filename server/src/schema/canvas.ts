@@ -12,10 +12,10 @@ export const updateCanvasDetailsSchema = z.object({
     collaboratorIds: z.array(z.string().transform((id) => new ObjectId(id))),
 });
 
-const canvasDataSchema = z
+export const canvasDataSchema = z
     .object({
         appState: z.custom<AppState>(),
         elements: z.array(z.custom<NonDeletedExcalidrawElement>()),
         files: z.custom<BinaryFiles>(),
     })
-    .optional();
+    .nullable();

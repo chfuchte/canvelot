@@ -9,7 +9,16 @@ import { ErrorComponent } from "@/components/error";
 
 import "@/styles/index.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+    defaultOptions: {
+        mutations: {
+            retry: false,
+        },
+        queries: {
+            retry: false,
+        },
+    },
+});
 
 const router = createRouter({
     routeTree,

@@ -11,7 +11,7 @@ import {
     unauthorized,
 } from "../lib/utils.js";
 import { logger } from "../lib/logger.js";
-import { createCanvasSchema, updateCanvasDetailsSchema } from "../schema/canvas.js";
+import { canvasDataSchema, createCanvasSchema, updateCanvasDetailsSchema } from "../schema/canvas.js";
 
 const log = logger({
     name: "router.canvas",
@@ -32,7 +32,7 @@ export function canvasRouter() {
                     WithId<
                         CanvasDocument & {
                             ownerUsername: UserDocument["username"];
-                            collaboratorUsernames: UserDocument["username"][];
+                            collaboratorUsernames: { _id: ObjectId; username: UserDocument["username"] }[];
                         }
                     >
                 >([
@@ -111,7 +111,7 @@ export function canvasRouter() {
                         lastModifiedAt: canvas.lastModifiedAt,
                         collaborators: canvas.collaboratorIds.map((id, index) => ({
                             id: id.toHexString(),
-                            username: canvas.collaboratorUsernames[index],
+                            username: canvas.collaboratorUsernames[index].username,
                         })),
                     };
                 }
@@ -241,6 +241,72 @@ export function canvasRouter() {
             log("error", `Failed to update canvas details: ${JSON.stringify(updateError)}`);
             return internalServerError(res);
         }
+
+        res.status(200).json({ success: true });
+    });
+
+    router.get("/:id", async (req, res) => {
+        const userId = getUserIdFromRequest(req);
+        if (!userId) return unauthorized(res);
+
+        const canvasId = req.params.id;
+
+        if (!ObjectId.isValid(canvasId)) return badRequest(res);
+
+        const [canvas, findError] = await tryCatch(
+            db.collection<CanvasDocument>(CANVAS_COLLECTION).findOne({
+                _id: new ObjectId(canvasId),
+                $or: [{ ownerId: userId }, { collaboratorIds: userId }],
+            }),
+        );
+
+        if (findError) {
+            log("error", `Failed to find canvas: ${JSON.stringify(findError)}`);
+            return internalServerError(res);
+        }
+
+        if (!canvas) return notFound(res);
+
+        res.status(200).json({
+            id: canvas._id.toHexString(),
+            name: canvas.name,
+            data: canvas.data,
+        });
+    });
+
+    router.put("/data/:id", async (req, res) => {
+        const userId = getUserIdFromRequest(req);
+        if (!userId) return unauthorized(res);
+
+        const canvasId = req.params.id;
+
+        if (!ObjectId.isValid(canvasId)) return badRequest(res);
+
+        const data = canvasDataSchema.safeParse(req.body);
+
+        if (!data.success) return badRequest(res);
+
+        const [result, error] = await tryCatch(
+            db.collection<CanvasDocument>(CANVAS_COLLECTION).updateOne(
+                {
+                    _id: new ObjectId(canvasId),
+                    $or: [{ ownerId: userId }, { collaboratorIds: userId }],
+                },
+                {
+                    $set: {
+                        data: data.data,
+                        lastModifiedAt: new Date(),
+                    },
+                },
+            ),
+        );
+
+        if (error) {
+            log("error", `Failed to update canvas data: ${JSON.stringify(error)}`);
+            return internalServerError(res);
+        }
+
+        if (result.matchedCount === 0) return notFound(res);
 
         res.status(200).json({ success: true });
     });

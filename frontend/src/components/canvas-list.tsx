@@ -17,7 +17,7 @@ export function CanvasListGrid({ children }: { children: React.ReactNode }) {
     );
 }
 
-export function CanvasList({list}: { list: CanvasList }) {
+export function CanvasList({ list }: { list: CanvasList }) {
     return (
         <CanvasListGrid>
             {list.map((canvas) => (

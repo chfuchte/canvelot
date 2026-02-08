@@ -5,9 +5,7 @@ const envSchema = z.object({
     PORT: z.string().default("8080").transform(Number),
     MONGO_URI: z.string().nonempty("MONGO_URI is required"),
     MONGO_DB_NAME: z.string().nonempty("MONGO_DB_NAME is required"),
-    CORS_ORIGINS: z
-        .string()
-        .transform((val) => val.split(",").map((origin) => origin.trim())),
+    CORS_ORIGINS: z.string().transform((val) => val.split(",").map((origin) => origin.trim())),
     STATIC_DIR_PATH: z.string().default("../static"),
     OAUTH_CLIENT_ID: z.string().nonempty("OAUTH_CLIENT_ID is required"),
     OAUTH_CLIENT_SECRET: z.string().nonempty("OAUTH_CLIENT_SECRET is required"),

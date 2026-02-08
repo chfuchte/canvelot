@@ -1,4 +1,4 @@
-import type { CanvasList, UserSelection } from "@/types/canvas";
+import type { Canvas, CanvasList, UserSelection } from "@/types/canvas";
 
 export const mockCanvasList: CanvasList = [
     {
@@ -50,3 +50,9 @@ export const mockUserSelectionData: UserSelection = [
         username: "alicesmith",
     },
 ];
+
+export const mockCanvas: Canvas = {
+    id: "1",
+    name: "Mock Canvas",
+    data: null,
+};

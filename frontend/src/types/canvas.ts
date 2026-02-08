@@ -1,3 +1,5 @@
+import type { NonDeletedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
+import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 import z from "zod";
 
 const canvasListOwnedCanvasSchema = z.object({
@@ -46,3 +48,17 @@ export const userSelectionSchema = z.array(
 );
 
 export type UserSelection = z.infer<typeof userSelectionSchema>;
+
+export const canvasSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    data: z
+        .object({
+            appState: z.custom<AppState>(),
+            elements: z.array(z.custom<NonDeletedExcalidrawElement>()),
+            files: z.custom<BinaryFiles>(),
+        })
+        .nullable(),
+});
+
+export type Canvas = z.infer<typeof canvasSchema>;

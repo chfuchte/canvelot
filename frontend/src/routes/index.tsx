@@ -15,9 +15,10 @@ export const Route = createFileRoute("/")({
 });
 
 function RouteComponent() {
-    const { data, error, isLoading } = useQuery(fetchCanvasListQueryOptions);
+    const { data, error, isLoading, isError } = useQuery(fetchCanvasListQueryOptions);
 
-    if (error) {
+    if (isError) {
+        console.error("Error fetching canvas list:", error);
         return <ErrorComponent />;
     }
 

@@ -7,6 +7,7 @@ import { EditCanvasDialog } from "@/components/dialogs/edit-canvas-dialog";
 import { Item, ItemActions, ItemDescription, ItemFooter, ItemHeader, ItemTitle } from "@/components/ui/item";
 import { Link } from "@tanstack/react-router";
 import { lastModifiedAtToRelativeTime } from "@/lib/utils";
+import { CreateCanvasDialog } from "./dialogs/create-canvas-dialog";
 
 export function CanvasListGrid({ children }: { children: React.ReactNode }) {
     return (
@@ -70,9 +71,11 @@ export function CanvasListEmpty() {
                 <EmptyDescription>Create your first canvas to get started</EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-                <Button>
-                    <Plus /> Create your first canvas
-                </Button>
+                <CreateCanvasDialog>
+                    <Button>
+                        <Plus /> Create your first canvas
+                    </Button>
+                </CreateCanvasDialog>
             </EmptyContent>
         </Empty>
     );

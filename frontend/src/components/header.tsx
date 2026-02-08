@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 
 export function Header({ children }: { children?: React.ReactNode }) {
     const handleLogout = () => {
-        window.location.href = "/api/logout";
+        window.location.href = "/api/authentication/logout";
     };
 
     return (

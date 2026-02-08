@@ -17,12 +17,14 @@ import { toast } from "sonner";
 import { FieldError, Field, FieldGroup, FieldLabel } from "../ui/field";
 import { useNavigate } from "@tanstack/react-router";
 import { tryCatch } from "@/lib/utils";
+import { useState } from "react";
 
 const formSchema = z.object({
     name: z.string().nonempty("Canvas name is required"),
 });
 
 export function CreateCanvasDialog({ children }: { children: React.ReactElement }) {
+    const [dialogOpen, setDialogOpen] = useState(false);
     const createCanvasMutation = useMutation(createCanvasMutationOptions);
     const navigate = useNavigate();
 
@@ -36,18 +38,20 @@ export function CreateCanvasDialog({ children }: { children: React.ReactElement 
         onSubmit: async ({ value }) => {
             const [data, error] = await tryCatch(createCanvasMutation.mutateAsync(value.name));
 
+            setDialogOpen(false);
+
             if (error) {
+                console.error("Error creating canvas:", error);
                 toast.error("Failed to update canvas");
                 return;
             }
-
             toast.success("Canvas updated successfully");
             navigate({ to: "/canvas/$canvasId", params: { canvasId: data.id } });
         },
     });
 
     return (
-        <Dialog>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent>
                 <form

@@ -17,50 +17,57 @@ export function CanvasListGrid({ children }: { children: React.ReactNode }) {
     );
 }
 
-export function CanvasList({ list }: { list: CanvasList }) {
+export function CanvasList({list}: { list: CanvasList }) {
     return (
         <CanvasListGrid>
             {list.map((canvas) => (
-                <Item key={canvas.id} variant="muted" title={canvas.name}>
-                    <ItemHeader>
-                        <Link
-                            to="/canvas/$canvasId"
-                            params={{ canvasId: canvas.id }}
-                            className="relative h-full w-full">
-                            <ItemTitle>{canvas.name}</ItemTitle>
-
-                            {canvas.is_shared ? (
-                                <ItemDescription>shared with you by {canvas.owner.username}</ItemDescription>
-                            ) : (
-                                <ItemDescription>
-                                    {canvas.sharedWith.length > 0
-                                        ? `shared with ${canvas.sharedWith.length} ${canvas.sharedWith.length > 1 ? "people" : "person"}`
-                                        : "private"}
-                                </ItemDescription>
-                            )}
-
-                            <ExternalLink className="absolute top-0 right-0 size-4 stroke-current" />
-                        </Link>
-                    </ItemHeader>
-                    <ItemFooter>
-                        <ItemDescription>{lastModifiedAtToRelativeTime(canvas.lastModifiedAt)}</ItemDescription>
-                        <ItemActions>
-                            <EditCanvasDialog id={canvas.id} prev={{ name: canvas.name }}>
-                                <Button variant="ghost" size="icon">
-                                    <Pen />
-                                </Button>
-                            </EditCanvasDialog>
-                            <DeleteCanvasDialog id={canvas.id} name={canvas.name}>
-                                <Button variant="ghost" size="icon">
-                                    <Trash />
-                                </Button>
-                            </DeleteCanvasDialog>
-                        </ItemActions>
-                    </ItemFooter>
-                </Item>
+                <CanvasListItem key={canvas.id} canvas={canvas} />
             ))}
         </CanvasListGrid>
     );
+}
+
+function CanvasListItem({ canvas }: { canvas: CanvasList[number] }) {
+    return (
+        <Item variant="muted" title={canvas.name}>
+            <ItemHeader>
+                <Link to="/canvas/$canvasId" params={{ canvasId: canvas.id }} className="relative h-full w-full">
+                    <ItemTitle>{canvas.name}</ItemTitle>
+
+                    {canvas.is_owner ? (
+                        <ItemDescription>{sharedWithText(canvas.collaborators.length)}</ItemDescription>
+                    ) : (
+                        <ItemDescription>shared with you by {canvas.owner.username}</ItemDescription>
+                    )}
+
+                    <ExternalLink className="absolute top-0 right-0 size-4 stroke-current" />
+                </Link>
+            </ItemHeader>
+            <ItemFooter>
+                <ItemDescription>{lastModifiedAtToRelativeTime(canvas.lastModifiedAt)}</ItemDescription>
+                {canvas.is_owner && (
+                    <ItemActions>
+                        <EditCanvasDialog prev={canvas}>
+                            <Button variant="ghost" size="icon">
+                                <Pen />
+                            </Button>
+                        </EditCanvasDialog>
+                        <DeleteCanvasDialog id={canvas.id} name={canvas.name}>
+                            <Button variant="ghost" size="icon">
+                                <Trash />
+                            </Button>
+                        </DeleteCanvasDialog>
+                    </ItemActions>
+                )}
+            </ItemFooter>
+        </Item>
+    );
+}
+
+function sharedWithText(amount: number): React.ReactElement {
+    if (amount === 0) return <span>private</span>;
+    if (amount === 1) return <span>shared with 1 person</span>;
+    return <span>shared with {amount} people</span>;
 }
 
 export function CanvasListEmpty() {

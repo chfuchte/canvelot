@@ -1,10 +1,17 @@
 import { Router } from "express";
 import { db } from "../db/index.js";
 import { CANVAS_COLLECTION, USER_COLLECTION, type CanvasDocument, type UserDocument } from "../db/schema.js";
-import { type WithId } from "mongodb";
-import { badRequest, getUserIdFromRequest, tryCatch, unauthorized } from "../lib/utils.js";
+import { ObjectId, type WithId } from "mongodb";
+import {
+    badRequest,
+    getUserIdFromRequest,
+    internalServerError,
+    notFound,
+    tryCatch,
+    unauthorized,
+} from "../lib/utils.js";
 import { logger } from "../lib/logger.js";
-import { createCanvasSchema } from "../schema/canvas.js";
+import { createCanvasSchema, updateCanvasDetailsSchema } from "../schema/canvas.js";
 
 const log = logger({
     name: "router.canvas",
@@ -25,13 +32,13 @@ export function canvasRouter() {
                     WithId<
                         CanvasDocument & {
                             ownerUsername: UserDocument["username"];
-                            sharedWithUsernames: UserDocument["username"][];
+                            collaboratorUsernames: UserDocument["username"][];
                         }
                     >
                 >([
                     {
                         $match: {
-                            $or: [{ ownerId: userId }, { sharedWithIds: userId }],
+                            $or: [{ ownerId: userId }, { collaboratorIds: userId }],
                         },
                     },
                     {
@@ -48,17 +55,26 @@ export function canvasRouter() {
                     {
                         $lookup: {
                             from: USER_COLLECTION,
-                            let: { sharedIds: "$sharedWithIds", isOwner: { $eq: ["$ownerId", userId] } },
+                            let: {
+                                collaboratorIds: "$collaboratorIds",
+                                isOwner: { $eq: ["$ownerId", userId] },
+                            },
                             pipeline: [
                                 {
                                     $match: {
                                         $expr: {
-                                            $and: [{ $in: ["$_id", "$$sharedIds"] }, { $eq: ["$$isOwner", true] }],
+                                            $and: [
+                                                { $in: ["$_id", "$$collaboratorIds"] },
+                                                { $eq: ["$$isOwner", true] },
+                                            ],
                                         },
                                     },
                                 },
+                                {
+                                    $project: { username: 1 },
+                                },
                             ],
-                            as: "sharedWithUsers",
+                            as: "collaboratorUsernames",
                         },
                     },
                     {
@@ -68,8 +84,8 @@ export function canvasRouter() {
                             lastModifiedAt: true,
                             ownerId: true,
                             ownerUsername: "$ownerInfo.username",
-                            sharedWithIds: true,
-                            sharedWithUsernames: "$sharedWithUsers.username",
+                            collaboratorIds: true,
+                            collaboratorUsernames: "$collaboratorUsernames",
                         },
                     },
                 ])
@@ -78,11 +94,8 @@ export function canvasRouter() {
 
         if (error) {
             log("error", `Failed to fetch canvases: ${JSON.stringify(error)}`);
-            res.status(500).json({ error: "Internal Server Error" });
-            return;
+            return internalServerError(res);
         }
-
-        log("debug", `Fetched ${results.length} canvases for user ${userId}: ${JSON.stringify(results)}`);
 
         res.status(200).json(
             results.map((canvas) => {
@@ -94,11 +107,11 @@ export function canvasRouter() {
                             id: canvas.ownerId.toHexString(),
                             username: canvas.ownerUsername,
                         },
+                        is_owner: true,
                         lastModifiedAt: canvas.lastModifiedAt,
-                        is_shared: false,
-                        sharedWith: canvas.sharedWithIds.map((id, index) => ({
+                        collaborators: canvas.collaboratorIds.map((id, index) => ({
                             id: id.toHexString(),
-                            username: canvas.sharedWithUsernames[index],
+                            username: canvas.collaboratorUsernames[index],
                         })),
                     };
                 }
@@ -110,7 +123,7 @@ export function canvasRouter() {
                         id: canvas.ownerId.toHexString(),
                         username: canvas.ownerUsername,
                     },
-                    is_shared: true,
+                    is_owner: false,
                     lastModifiedAt: canvas.lastModifiedAt,
                 };
             }),
@@ -131,18 +144,105 @@ export function canvasRouter() {
                 name: creationData.name,
                 ownerId: userId,
                 lastModifiedAt: new Date(),
-                sharedWithIds: [],
+                collaboratorIds: [],
                 data: null,
             }),
         );
 
         if (error) {
             log("error", `Failed to create canvas: ${JSON.stringify(error)}`);
-            res.status(500).json({ error: "Internal Server Error" });
-            return;
+            return internalServerError(res);
         }
 
         res.status(200).json({ id: result.insertedId.toHexString() });
+    });
+
+    router.delete("/:id", async (req, res) => {
+        const userId = getUserIdFromRequest(req);
+        if (!userId) return unauthorized(res);
+
+        const canvasId = req.params.id;
+
+        if (!ObjectId.isValid(canvasId)) return badRequest(res);
+
+        const [canvas, findError] = await tryCatch(
+            db.collection<CanvasDocument>(CANVAS_COLLECTION).findOne({
+                _id: new ObjectId(canvasId),
+                ownerId: userId,
+            }),
+        );
+
+        if (findError) {
+            log("error", `Failed to find canvas: ${JSON.stringify(findError)}`);
+            return internalServerError(res);
+        }
+
+        if (!canvas) return notFound(res);
+
+        const [deleteResult, deleteError] = await tryCatch(
+            db.collection<CanvasDocument>(CANVAS_COLLECTION).deleteOne({
+                _id: new ObjectId(canvasId),
+                ownerId: userId,
+            }),
+        );
+
+        if (deleteError || deleteResult.deletedCount === 0) {
+            log("error", `Failed to delete canvas: ${JSON.stringify(deleteError)}`);
+            return internalServerError(res);
+        }
+
+        res.status(200).json({ success: true });
+    });
+
+    router.put("/details/:id", async (req, res) => {
+        const userId = getUserIdFromRequest(req);
+        if (!userId) return unauthorized(res);
+
+        const canvasId = req.params.id;
+
+        if (!ObjectId.isValid(canvasId)) return badRequest(res);
+
+        const { success, data } = updateCanvasDetailsSchema.safeParse(req.body);
+
+        if (!success) return badRequest(res);
+
+        const [canvas, findError] = await tryCatch(
+            db.collection<CanvasDocument>(CANVAS_COLLECTION).findOne({
+                _id: new ObjectId(canvasId),
+                ownerId: userId,
+            }),
+        );
+
+        if (findError) {
+            log("error", `Failed to find canvas: ${JSON.stringify(findError)}`);
+            return internalServerError(res);
+        }
+
+        if (!canvas) return notFound(res);
+
+        if (data.collaboratorIds.some((id) => id.equals(userId))) {
+            return badRequest(res);
+        }
+
+        const [updateResult, updateError] = await tryCatch(
+            db.collection<CanvasDocument>(CANVAS_COLLECTION).updateOne(
+                { _id: new ObjectId(canvasId), ownerId: userId },
+                {
+                    $set: {
+                        name: data.name,
+                        collaboratorIds: data.collaboratorIds,
+                        lastModifiedAt: new Date(),
+                    },
+                },
+            ),
+        );
+
+        if (updateError || updateResult.matchedCount === 0) {
+            log("error", `Failed to update canvas details: ${JSON.stringify(updateError)}`);
+            return internalServerError(res);
+        }
+
+        res.status(200).json({ success: true });
     });
 
     return router;

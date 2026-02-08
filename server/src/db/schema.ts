@@ -8,7 +8,7 @@ export type CanvasDocument = {
     name: string;
     lastModifiedAt: Date;
     ownerId: ObjectId;
-    sharedWithIds: ObjectId[];
+    collaboratorIds: ObjectId[];
     data: {
         elements: NonDeletedExcalidrawElement[];
         appState: AppState;

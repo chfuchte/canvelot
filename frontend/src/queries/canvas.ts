@@ -11,12 +11,14 @@ export const fetchCanvasListQueryOptions = queryOptions({
 async function fetchCanvasList(): Promise<CanvasList> {
     if (import.meta.env.DEV) return mockCanvasList;
 
-    const [response, fetchErr] = await tryCatch(fetch("/api/canvas", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    }));
+    const [response, fetchErr] = await tryCatch(
+        fetch("/api/canvas", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }),
+    );
     if (fetchErr) throw fetchErr;
 
     if (!response.ok) throw new Error("Failed to fetch canvases");
@@ -40,13 +42,17 @@ export const createCanvasMutationOptions = {
 };
 
 async function createCanvas(name: string) {
-    const [response, fetchErr] = await tryCatch(fetch("/api/canvas", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name }),
-    }));
+    if (import.meta.env.DEV) return { id: "1" };
+
+    const [response, fetchErr] = await tryCatch(
+        fetch("/api/canvas", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name }),
+        }),
+    );
     if (fetchErr) throw fetchErr;
 
     if (!response.ok) throw new Error("Failed to create canvas");
@@ -62,4 +68,51 @@ async function createCanvas(name: string) {
     }
 
     return data;
+}
+
+export const deleteCanvasMutationOptions = {
+    mutationKey: ["delete-canvas"],
+    mutationFn: deleteCanvas,
+};
+
+async function deleteCanvas(id: string) {
+    if (import.meta.env.DEV) return true;
+
+    const [response, fetchErr] = await tryCatch(
+        fetch(`/api/canvas/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }),
+    );
+    if (fetchErr) throw fetchErr;
+
+    if (!response.ok) throw new Error("Failed to delete canvas");
+
+    return true;
+}
+
+export const editCanvasDetailsMutationOptions = {
+    mutationKey: ["edit-canvas-details"],
+    mutationFn: editCanvasDetails,
+};
+
+async function editCanvasDetails(data: { id: string; name: string; collaboratorIds: string[] }) {
+    if (import.meta.env.DEV) return true;
+
+    const [response, fetchErr] = await tryCatch(
+        fetch(`/api/canvas/details/${data.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name: data.name, collaboratorIds: data.collaboratorIds }),
+        }),
+    );
+    if (fetchErr) throw fetchErr;
+
+    if (!response.ok) throw new Error("Failed to edit canvas details");
+
+    return true;
 }

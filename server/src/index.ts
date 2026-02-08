@@ -9,6 +9,7 @@ import { join } from "node:path";
 import { logger } from "./lib/logger.js";
 import { authenticationRouter } from "./router/authentication.js";
 import { canvasRouter } from "./router/canvas.js";
+import { userRouter } from "./router/user.js";
 
 const log = logger({
     name: "server",
@@ -34,6 +35,7 @@ app.use(authMiddleware);
 
 app.use("/api/authentication", authenticationRouter());
 app.use("/api/canvas", canvasRouter());
+app.use("/api/user", userRouter());
 
 app.use(express.static(env.STATIC_DIR_PATH));
 app.use((req, res) => {

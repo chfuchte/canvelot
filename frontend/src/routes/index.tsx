@@ -9,6 +9,8 @@ import { Footer } from "@/components/footer";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
+import { useCanvasStore } from "@/stores/canvas";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/")({
     component: RouteComponent,
@@ -16,11 +18,19 @@ export const Route = createFileRoute("/")({
 
 function RouteComponent() {
     const { data, error, isLoading, isError } = useQuery(fetchCanvasListQueryOptions);
+    const setList = useCanvasStore((state) => state.setList);
+    const list = useCanvasStore((state) => state.list);
 
     if (isError) {
         console.error("Error fetching canvas list:", error);
         return <ErrorComponent />;
     }
+
+    useEffect(() => {
+        if (data) {
+            setList(data);
+        }
+    }, [data, setList]);
 
     return (
         <>
@@ -40,8 +50,8 @@ function RouteComponent() {
                                 <ItemLoading key={i} />
                             ))}
                     </CanvasListGrid>
-                ) : data && data.length > 0 ? (
-                    <CanvasList list={data} />
+                ) : list.length > 0 ? (
+                    <CanvasList list={list} />
                 ) : (
                     <CanvasListEmpty />
                 )}

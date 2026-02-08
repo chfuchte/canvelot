@@ -1,16 +1,16 @@
-import type { CanvasList } from "@/types/canvas";
+import type { CanvasList, UserSelection } from "@/types/canvas";
 
 export const mockCanvasList: CanvasList = [
     {
         id: "1",
         name: "Private Canvas",
-        lastModifiedAt: new Date(Date.now() - 1000 * 60 * 60),
+        lastModifiedAt: new Date(Date.now() - 1000 * 60 * 40),
         owner: {
             id: "1",
             username: "cfu",
         },
-        is_shared: false,
-        sharedWith: [],
+        is_owner: true,
+        collaborators: [],
     },
     {
         id: "2",
@@ -20,7 +20,7 @@ export const mockCanvasList: CanvasList = [
             id: "2",
             username: "alicesmith",
         },
-        is_shared: true,
+        is_owner: false,
     },
     {
         id: "3",
@@ -30,12 +30,23 @@ export const mockCanvasList: CanvasList = [
             id: "1",
             username: "cfu",
         },
-        is_shared: false,
-        sharedWith: [
+        is_owner: true,
+        collaborators: [
             {
                 id: "2",
                 username: "alicesmith",
             },
         ],
+    },
+];
+
+export const mockUserSelectionData: UserSelection = [
+    {
+        id: "1",
+        username: "cfu",
+    },
+    {
+        id: "2",
+        username: "alicesmith",
     },
 ];

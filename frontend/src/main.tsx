@@ -1,12 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { routeTree } from "@/routeTree.gen";
-import { ErrorComponent, RouterProvider, createRouter } from "@tanstack/react-router";
+import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { ThemeProvider } from "@/hooks/theme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NotFoundComponent } from "./components/not-found";
+import { ErrorComponent } from "@/components/error";
 
 import "@/styles/index.css";
-import { NotFoundComponent } from "./components/not-found";
 
 const queryClient = new QueryClient();
 

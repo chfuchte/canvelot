@@ -1,0 +1,62 @@
+secrets:
+    oauth_client_id:
+        file: ./secrets/oauth_client_id.txt
+    oauth_client_secret:
+        file: ./secrets/oauth_client_secret.txt
+    oauth_discovery_url:
+        file: ./secrets/oauth_discovery_url.txt
+    oauth_logout_redirect_url:
+        file: ./secrets/oauth_logout_redirect_url.txt
+    auth_secret:
+        file: ./secrets/auth_secret.txt
+
+networks:
+    canvelot:
+        driver: bridge
+
+services:
+    mongodb:
+        image: docker.io/mongodb/mongodb-community-server:6.0.27-ubi8
+        restart: on-failure
+        volumes:
+            - mongodb_data:/data/db
+        networks:
+            - canvelot
+        environment:
+            MONGODB_REPLICA_SET_NAME: ${MONGODB_REPLICA_SET_NAME:-rs0}
+            MONGODB_PORT_NUMBER: ${MONGODB_PORT_NUMBER:-27017}
+            MONGODB_INITIAL_PRIMARY_HOST: ${MONGODB_INITIAL_PRIMARY_HOST:-mongodb}
+        entrypoint: |
+            bash -c 
+                "mongod --replSet $$MONGODB_REPLICA_SET_NAME --bind_ip_all &
+                    sleep 2;
+                    until mongosh --eval \"db.adminCommand('ping')\"; do 
+                        echo '=====> Waiting for Mongo...';
+                        sleep 1;
+                    done;
+                    echo \"=====> Initiating ReplSet $$MONGODB_REPLICA_SET_NAME at $$MONGODB_INITIAL_PRIMARY_HOST:$$MONGODB_PORT_NUMBER...\";
+                    mongosh --eval \"rs.initiate({_id: '$$MONGODB_REPLICA_SET_NAME', members: [{ _id: 0, host: '$$MONGODB_INITIAL_PRIMARY_HOST:$$MONGODB_PORT_NUMBER' }]})\";
+                    echo '=====> Initiating ReplSet done...';
+                wait"
+    canvelot:
+        image: ghcr.io/chfuchte/canvelot:latest
+        restart: on-failure
+        ports:
+            - 8080:80
+        depends_on:
+            - mongodb
+        networks:
+            - canvelot
+        environment:
+            - MONGO_URI=mongodb://mongodb:27017/canvelot
+            - MONGO_DB_NAME=canvelot
+            - BASE_URL=http://localhost:8080
+            - CORS_ORIGINS=http://localhost:8080
+        secrets:
+            - oauth_client_id
+            - oauth_client_secret
+            - oauth_discovery_url
+            - oauth_logout_redirect_url
+            - auth_secret
+volumes:
+    mongodb_data:

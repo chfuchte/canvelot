@@ -3,7 +3,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
-export function NotFound() {
+export function NotFoundComponent() {
     return (
         <div className="grid h-dvh place-items-center">
             <Empty>

@@ -1,22 +1,23 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { routeTree } from "@/routeTree.gen";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { ErrorComponent, RouterProvider, createRouter } from "@tanstack/react-router";
 import { ThemeProvider } from "@/hooks/theme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "@/styles/index.css";
+import { NotFoundComponent } from "./components/not-found";
 
 const queryClient = new QueryClient();
 
 const router = createRouter({
     routeTree,
-    context: {
-        queryClient,
-    },
     defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
     scrollRestoration: true,
+    defaultErrorComponent: ErrorComponent,
+    defaultNotFoundComponent: NotFoundComponent,
+    isServer: false,
 });
 
 declare module "@tanstack/react-router" {

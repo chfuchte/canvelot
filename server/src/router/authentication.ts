@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { tryCatch } from "../lib/utils.js";
+import { internalServerError, tryCatch, unauthorized } from "../lib/utils.js";
 import { logger } from "../lib/logger.js";
 import { auth } from "../lib/auth.js";
 import { fromNodeHeaders } from "better-auth/node";
@@ -22,14 +22,10 @@ export function authenticationRouter() {
 
         if (error) {
             log("error", `Failed to log out user: ${JSON.stringify(error)}`);
-            res.status(500).json({ error: "Internal Server Error" });
-            return;
+            return internalServerError(res);
         }
 
-        if (!success) {
-            res.status(401).json({ error: "Unauthorized" });
-            return;
-        }
+        if (!success) return unauthorized(res);
 
         res.redirect(env.OAUTH_LOGOUT_REDIRECT_URL);
     });

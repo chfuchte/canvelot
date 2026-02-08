@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { auth } from "../lib/auth.js";
 import { fromNodeHeaders } from "better-auth/node";
-import { tryCatch } from "../lib/utils.js";
+import { internalServerError, isAsset, isAPIRoute, tryCatch, unauthorized } from "../lib/utils.js";
 import { logger } from "../lib/logger.js";
 import { APIError } from "better-auth";
 
@@ -19,7 +19,7 @@ const log = logger({
 });
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
-    if (req.method === "GET" && /^\/?(?:fonts\/.*|assets\/.*|robots\.txt|favicon\.ico|logo.*)$/.test(req.path)) {
+    if (req.method === "GET" && isAsset(req.path)) {
         return next();
     }
 
@@ -32,16 +32,16 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     if (sessionError) {
         log("error", `Error fetching session: ${JSON.stringify(sessionError)}`);
 
-        if (sessionError instanceof APIError) {
-            res.status(sessionError.statusCode).send(sessionError.body);
-        } else {
-            res.status(500).json({ error: "Internal Server Error" });
-        }
+        if (sessionError instanceof APIError) return res.status(sessionError.statusCode).send(sessionError.body);
 
-        return;
+        return internalServerError(res);
     }
 
     if (!session) {
+        if (isAPIRoute(req.path)) {
+            return unauthorized(res);
+        }
+
         const [data, error] = await tryCatch(
             auth.api.signInWithOAuth2({
                 body: {
@@ -54,16 +54,16 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 
         if (error) {
             log("error", `Error signing in with OAuth2: ${JSON.stringify(error)}`);
-            res.status(500).json({ error: "Internal Server Error" });
-            return;
+            return internalServerError(res);
         }
 
-        if (!data.response.redirect) return;
+        if (!data.response.redirect) {
+            log("warn", "OAuth2 sign-in did not return a redirect while no session was found");
+            return internalServerError(res);
+        }
 
         res.setHeader("Set-Cookie", data.headers.get("set-cookie") || "");
-        res.redirect(data.response.url);
-
-        return;
+        return res.redirect(data.response.url);
     }
 
     req.session = session;

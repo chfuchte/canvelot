@@ -1,18 +1,33 @@
-import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
-import type { NonDeletedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import z from "zod";
 
-export const canvasSchema = z.object({
-    _id: z.string(),
+const canvasListOwnedCanvasSchema = z.object({
+    id: z.string(),
     name: z.string(),
-    data: z
-        .object({
-            appState: z.custom<AppState>(),
-            elements: z.array(z.custom<NonDeletedExcalidrawElement>()),
-            files: z.custom<BinaryFiles>(),
-        })
-        .optional()
-        .nullable(),
+    owner: z.object({
+        id: z.string(),
+        username: z.string(),
+    }),
+    lastModifiedAt: z.date(),
+    is_shared: z.literal(false),
+    sharedWith: z.array(
+        z.object({
+            id: z.string(),
+            username: z.string(),
+        }),
+    ),
 });
 
-export type Canvas = z.infer<typeof canvasSchema>;
+const canvasListSharedCanvasSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    owner: z.object({
+        id: z.string(),
+        username: z.string(),
+    }),
+    lastModifiedAt: z.date(),
+    is_shared: z.literal(true),
+});
+
+export const canvasListSchema = z.array(canvasListOwnedCanvasSchema.or(canvasListSharedCanvasSchema));
+
+export type CanvasList = z.infer<typeof canvasListSchema>;

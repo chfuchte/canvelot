@@ -1,8 +1,8 @@
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "./ui/input";
+import { Input } from "@/components/ui/input";
 import * as z from "zod";
 import { useForm } from "@tanstack/react-form";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogClose,
@@ -11,26 +11,20 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "./ui/dialog";
-import { useMutation } from "@tanstack/react-query";
-import { saveCanvasMutationOptions } from "@/queries/canvas";
-import { toast } from "sonner";
+} from "@/components/ui/dialog";
 
 const formSchema = z.object({
     name: z.string().nonempty("Canvas name is required"),
 });
 
 export function EditCanvasDialog({
-    id,
     prev,
     children,
 }: {
     id: string;
     prev: { name: string };
-    children: React.ReactNode;
+    children: React.ReactElement;
 }) {
-    const updateCanvasMutation = useMutation(saveCanvasMutationOptions);
-
     const form = useForm({
         defaultValues: {
             name: prev.name,
@@ -38,8 +32,8 @@ export function EditCanvasDialog({
         validators: {
             onSubmit: formSchema,
         },
-        onSubmit: async ({ value }) => {
-            const success = await updateCanvasMutation.mutateAsync({
+        onSubmit: async () => {
+            /* const success = await updateCanvasMutation.mutateAsync({
                 _id: id,
                 name: value.name,
             });
@@ -48,13 +42,13 @@ export function EditCanvasDialog({
                 toast.success("Canvas updated successfully");
             } else {
                 toast.error("Failed to update canvas");
-            }
+            } */
         },
     });
 
     return (
         <Dialog>
-            <DialogTrigger>{children}</DialogTrigger>
+            <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent>
                 <form
                     id="edit-canvas-form"
@@ -92,7 +86,7 @@ export function EditCanvasDialog({
                         <Button type="submit" form="edit-canvas-form">
                             Submit
                         </Button>
-                        <DialogClose>
+                        <DialogClose asChild>
                             <Button variant="secondary">Cancel</Button>
                         </DialogClose>
                     </DialogFooter>

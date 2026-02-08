@@ -1,0 +1,11 @@
+.excalidraw button.help-icon {
+    display: none;
+}
+
+.excalidraw .sidebar-trigger__label-element[title="Library"] {
+    display: none;
+}
+
+/* .excalidraw {} */
+
+/* .excalidraw.theme--dark {} */

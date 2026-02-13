@@ -12,10 +12,12 @@ export const mockCanvasList: CanvasList = [
         is_owner: true,
         editable: true,
         collaborators: [],
-        viewers: [{
-            id: "2",
-            username: "alicesmith",
-        }]
+        viewers: [
+            {
+                id: "2",
+                username: "alicesmith",
+            },
+        ],
     },
     {
         id: "2",
@@ -44,7 +46,7 @@ export const mockCanvasList: CanvasList = [
                 username: "alicesmith",
             },
         ],
-        viewers: []
+        viewers: [],
     },
 ];
 

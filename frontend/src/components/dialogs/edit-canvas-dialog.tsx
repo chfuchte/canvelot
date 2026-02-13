@@ -17,7 +17,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchUserSelectionQueryOptions } from "@/queries/user";
 import type { OwnedCanvas } from "@/types/canvas";
 import { MultiSelect } from "../ui/multi-select";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { editCanvasDetailsMutationOptions } from "@/queries/canvas";
 import { tryCatch } from "@/lib/utils";

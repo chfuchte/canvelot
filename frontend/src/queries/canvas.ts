@@ -99,7 +99,7 @@ export const editCanvasDetailsMutationOptions = {
     mutationFn: editCanvasDetails,
 };
 
-async function editCanvasDetails(data: { id: string; name: string; collaboratorIds: string[], viewerIds: string[] }) {
+async function editCanvasDetails(data: { id: string; name: string; collaboratorIds: string[]; viewerIds: string[] }) {
     if (import.meta.env.DEV) return true;
 
     const [response, fetchErr] = await tryCatch(

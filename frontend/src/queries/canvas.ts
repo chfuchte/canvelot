@@ -13,7 +13,7 @@ async function fetchCanvasList(): Promise<CanvasList> {
     if (import.meta.env.DEV) return mockCanvasList;
 
     const [response, fetchErr] = await tryCatch(
-        fetch("/api/canvas", {
+        fetch(`${__API_URL__}/api/canvas`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -46,7 +46,7 @@ async function createCanvas(name: string) {
     if (import.meta.env.DEV) return { id: "1" };
 
     const [response, fetchErr] = await tryCatch(
-        fetch("/api/canvas", {
+        fetch(`${__API_URL__}/api/canvas`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -80,7 +80,7 @@ async function deleteCanvas(id: string) {
     if (import.meta.env.DEV) return true;
 
     const [response, fetchErr] = await tryCatch(
-        fetch(`/api/canvas/${id}`, {
+        fetch(`${__API_URL__}/api/canvas/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -103,7 +103,7 @@ async function editCanvasDetails(data: { id: string; name: string; collaboratorI
     if (import.meta.env.DEV) return true;
 
     const [response, fetchErr] = await tryCatch(
-        fetch(`/api/canvas/details/${data.id}`, {
+        fetch(`${__API_URL__}/api/canvas/details/${data.id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -128,7 +128,7 @@ async function fetchCanvas(id: string) {
     if (import.meta.env.DEV) return mockCanvas;
 
     const [response, fetchErr] = await tryCatch(
-        fetch(`/api/canvas/${id}`, {
+        fetch(`${__API_URL__}/api/canvas/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -164,7 +164,7 @@ async function editCanvasData({ id, data }: { id: string; data: Record<string, u
     const compressed = gzip(json);
 
     const [response, fetchErr] = await tryCatch(
-        fetch(`/api/canvas/data/${id}`, {
+        fetch(`${__API_URL__}/api/canvas/data/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

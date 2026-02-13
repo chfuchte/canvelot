@@ -20,6 +20,7 @@ export default defineConfig({
     define: {
         __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
         __BUILD_DATE__: JSON.stringify(new Date().toISOString()),
+        __API_URL__: JSON.stringify(process.env.VITE_API_URL || ""),
     },
     resolve: {
         alias: {

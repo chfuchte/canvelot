@@ -88,6 +88,9 @@ export function canvasRouter() {
                             collaboratorUsernames: "$collaboratorUsernames",
                         },
                     },
+                    {
+                        $sort: { lastModifiedAt: -1, name: 1 },
+                    },
                 ])
                 .toArray(),
         );

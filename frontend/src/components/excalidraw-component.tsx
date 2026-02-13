@@ -35,6 +35,10 @@ export function ExcalidrawComponent({ canvas }: { canvas: Canvas }) {
 
     const handleSaveCanvas = async () => {
         if (!excalidrawAPI) return;
+        if (!canvas.editable) {
+            toast.error("You don't have permission to edit this canvas");
+            return;
+        }
 
         const appState = excalidrawAPI.getAppState();
         const elements = excalidrawAPI.getSceneElements();
@@ -82,6 +86,7 @@ export function ExcalidrawComponent({ canvas }: { canvas: Canvas }) {
     return (
         <Excalidraw
             aiEnabled={false}
+            viewModeEnabled={canvas.editable ? undefined : true}
             showDeprecatedFonts={false}
             handleKeyboardGlobally={false}
             excalidrawAPI={(api) => setExcalidrawAPI(api)}
@@ -102,13 +107,15 @@ export function ExcalidrawComponent({ canvas }: { canvas: Canvas }) {
                     <LayoutGrid className="stroke-current" /> Back to Menu
                 </MainMenu.Item>
 
-                <MainMenu.Item
-                    onSelect={(e) => {
-                        e.preventDefault();
-                        void handleSaveCanvas();
-                    }}>
-                    <Save className="stroke-current" /> Save
-                </MainMenu.Item>
+                {canvas.editable && (
+                    <MainMenu.Item
+                        onSelect={(e) => {
+                            e.preventDefault();
+                            void handleSaveCanvas();
+                        }}>
+                        <Save className="stroke-current" /> Save
+                    </MainMenu.Item>
+                )}
 
                 <MainMenu.Separator />
 

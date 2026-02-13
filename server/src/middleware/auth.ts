@@ -46,6 +46,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
             auth.api.signInWithOAuth2({
                 body: {
                     providerId: "oauth",
+                    callbackURL: `${req.protocol}://${req.host}${req.originalUrl}`,
                 },
                 returnHeaders: true,
                 headers: fromNodeHeaders(req.headers),

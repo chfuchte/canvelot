@@ -12,7 +12,7 @@ async function fetchUserSelectionData(): Promise<UserSelection> {
     if (import.meta.env.DEV) return mockUserSelectionData;
 
     const [response, fetchErr] = await tryCatch(
-        fetch("/api/user/selection-data", {
+        fetch(`${__API_URL__}/api/user/selection-data`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

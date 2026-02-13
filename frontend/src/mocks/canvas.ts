@@ -10,7 +10,12 @@ export const mockCanvasList: CanvasList = [
             username: "cfu",
         },
         is_owner: true,
+        editable: true,
         collaborators: [],
+        viewers: [{
+            id: "2",
+            username: "alicesmith",
+        }]
     },
     {
         id: "2",
@@ -21,6 +26,7 @@ export const mockCanvasList: CanvasList = [
             username: "alicesmith",
         },
         is_owner: false,
+        editable: false,
     },
     {
         id: "3",
@@ -31,12 +37,14 @@ export const mockCanvasList: CanvasList = [
             username: "cfu",
         },
         is_owner: true,
+        editable: true,
         collaborators: [
             {
                 id: "2",
                 username: "alicesmith",
             },
         ],
+        viewers: []
     },
 ];
 
@@ -54,5 +62,6 @@ export const mockUserSelectionData: UserSelection = [
 export const mockCanvas: Canvas = {
     id: "1",
     name: "Mock Canvas",
+    editable: true,
     data: null,
 };

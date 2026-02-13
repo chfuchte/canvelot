@@ -6,12 +6,19 @@ const canvasListOwnedCanvasSchema = z.object({
     id: z.string(),
     name: z.string(),
     is_owner: z.literal(true),
+    editable: z.literal(true),
     owner: z.object({
         id: z.string(),
         username: z.string(),
     }),
     lastModifiedAt: z.string().transform((str) => new Date(str)),
     collaborators: z.array(
+        z.object({
+            id: z.string(),
+            username: z.string(),
+        }),
+    ),
+    viewers: z.array(
         z.object({
             id: z.string(),
             username: z.string(),
@@ -25,6 +32,7 @@ const canvasListSharedCanvasSchema = z.object({
     id: z.string(),
     name: z.string(),
     is_owner: z.literal(false),
+    editable: z.boolean(),
     owner: z.object({
         id: z.string(),
         username: z.string(),
@@ -52,6 +60,7 @@ export type UserSelection = z.infer<typeof userSelectionSchema>;
 export const canvasSchema = z.object({
     id: z.string(),
     name: z.string(),
+    editable: z.boolean(),
     data: z
         .object({
             appState: z.custom<AppState>(),

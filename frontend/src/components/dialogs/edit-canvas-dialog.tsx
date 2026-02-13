@@ -17,7 +17,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchUserSelectionQueryOptions } from "@/queries/user";
 import type { OwnedCanvas } from "@/types/canvas";
 import { MultiSelect } from "../ui/multi-select";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { editCanvasDetailsMutationOptions } from "@/queries/canvas";
 import { tryCatch } from "@/lib/utils";
@@ -29,15 +29,33 @@ export function EditCanvasDialog({ prev, children }: { prev: OwnedCanvas; childr
     const { data: users, isError, error, isLoading } = useQuery(fetchUserSelectionQueryOptions);
     const editCanvasDetailsMutation = useMutation(editCanvasDetailsMutationOptions);
 
-    const formSchema = z.object({
-        name: z.string().nonempty("Canvas name is required"),
-        collaborators: z.array(z.enum(users?.map((u) => u.id) || [])),
-    });
+    const formSchema = z
+        .object({
+            name: z.string().nonempty("Canvas name is required"),
+            collaborators: z.array(z.enum(users?.map((u) => u.id) || [])),
+            viewers: z.array(z.enum(users?.map((u) => u.id) || [])),
+        })
+        .refine(
+            (data) => {
+                const collaboratorSet = new Set(data.collaborators);
+                const viewerSet = new Set(data.viewers);
+                return (
+                    collaboratorSet.size === data.collaborators.length &&
+                    viewerSet.size === data.viewers.length &&
+                    [...collaboratorSet].every((id) => !viewerSet.has(id))
+                );
+            },
+            {
+                message: "Collaborators and viewers must be different users",
+                path: ["collaborators"],
+            },
+        );
 
     const form = useForm({
         defaultValues: {
             name: prev.name,
             collaborators: prev.collaborators.map((u) => u.id),
+            viewers: prev.viewers.map((u) => u.id),
         },
         validators: {
             onSubmit: formSchema,
@@ -48,6 +66,7 @@ export function EditCanvasDialog({ prev, children }: { prev: OwnedCanvas; childr
                     id: prev.id,
                     name: value.name,
                     collaboratorIds: value.collaborators,
+                    viewerIds: value.viewers,
                 }),
             );
 
@@ -64,9 +83,14 @@ export function EditCanvasDialog({ prev, children }: { prev: OwnedCanvas; childr
                 name: value.name,
                 collaborators:
                     users
-                        ?.filter((u) => value.collaborators.includes(u.id))
+                        ?.filter((u) => value.collaborators.includes(u.id) && !value.viewers.includes(u.id))
+                        .map((u) => ({ id: u.id, username: u.username })) || [],
+                viewers:
+                    users
+                        ?.filter((u) => value.viewers.includes(u.id) && !value.collaborators.includes(u.id))
                         .map((u) => ({ id: u.id, username: u.username })) || [],
                 is_owner: prev.is_owner,
+                editable: prev.editable,
                 lastModifiedAt: new Date(),
                 owner: prev.owner,
             });
@@ -117,27 +141,71 @@ export function EditCanvasDialog({ prev, children }: { prev: OwnedCanvas; childr
                                 );
                             }}
                         />
-                        <form.Field
-                            name="collaborators"
-                            children={(field) => {
-                                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-                                return (
-                                    <Field data-invalid={isInvalid}>
-                                        <FieldLabel htmlFor={field.name}>Collaborators</FieldLabel>
-                                        <MultiSelect
-                                            id={field.name}
-                                            name={field.name}
-                                            value={field.state.value}
-                                            onBlur={field.handleBlur}
-                                            onChange={field.handleChange}
-                                            placeholder="Select users"
-                                            options={users.map((u) => ({ name: u.username, id: u.id }))}
-                                            aria-invalid={isInvalid}
-                                        />
-                                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                                    </Field>
-                                );
-                            }}
+                        <form.Subscribe
+                            selector={(state) => state.values.viewers}
+                            children={(viewers) => (
+                                <form.Field
+                                    name="collaborators"
+                                    children={(field) => {
+                                        const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+
+                                        return (
+                                            <Field data-invalid={isInvalid}>
+                                                <FieldLabel htmlFor={field.name}>Collaborators</FieldLabel>
+                                                <MultiSelect
+                                                    id={field.name}
+                                                    name={field.name}
+                                                    value={field.state.value}
+                                                    onBlur={field.handleBlur}
+                                                    onChange={field.handleChange}
+                                                    placeholder="Select collaborators"
+                                                    options={users
+                                                        .filter((u) => !viewers.includes(u.id))
+                                                        .map((u) => ({
+                                                            name: u.username,
+                                                            id: u.id,
+                                                        }))}
+                                                    aria-invalid={isInvalid}
+                                                />
+                                                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                                            </Field>
+                                        );
+                                    }}
+                                />
+                            )}
+                        />
+                        <form.Subscribe
+                            selector={(state) => state.values.collaborators}
+                            children={(collaborators) => (
+                                <form.Field
+                                    name="viewers"
+                                    children={(field) => {
+                                        const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+
+                                        return (
+                                            <Field data-invalid={isInvalid}>
+                                                <FieldLabel htmlFor={field.name}>Viewers</FieldLabel>
+                                                <MultiSelect
+                                                    id={field.name}
+                                                    name={field.name}
+                                                    value={field.state.value}
+                                                    onBlur={field.handleBlur}
+                                                    onChange={field.handleChange}
+                                                    placeholder="Select users"
+                                                    options={users
+                                                        .filter((u) => !collaborators.includes(u.id))
+                                                        .map((u) => ({
+                                                            name: u.username,
+                                                            id: u.id,
+                                                        }))}
+                                                    aria-invalid={isInvalid}
+                                                />
+                                                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                                            </Field>
+                                        );
+                                    }}
+                                />
+                            )}
                         />
                     </FieldGroup>
                     <DialogFooter>

@@ -33,12 +33,13 @@ export function canvasRouter() {
                         CanvasDocument & {
                             ownerUsername: UserDocument["username"];
                             collaboratorUsernames: { _id: ObjectId; username: UserDocument["username"] }[];
+                            viewerUsernames: { _id: ObjectId; username: UserDocument["username"] }[];
                         }
                     >
                 >([
                     {
                         $match: {
-                            $or: [{ ownerId: userId }, { collaboratorIds: userId }],
+                            $or: [{ ownerId: userId }, { collaboratorIds: userId }, { viewerIds: userId }],
                         },
                     },
                     {
@@ -78,6 +79,28 @@ export function canvasRouter() {
                         },
                     },
                     {
+                        $lookup: {
+                            from: USER_COLLECTION,
+                            let: {
+                                viewerIds: "$viewerIds",
+                                isOwner: { $eq: ["$ownerId", userId] },
+                            },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $and: [{ $in: ["$_id", "$$viewerIds"] }, { $eq: ["$$isOwner", true] }],
+                                        },
+                                    },
+                                },
+                                {
+                                    $project: { username: 1 },
+                                },
+                            ],
+                            as: "viewerUsernames",
+                        },
+                    },
+                    {
                         $project: {
                             _id: true,
                             name: true,
@@ -86,6 +109,8 @@ export function canvasRouter() {
                             ownerUsername: "$ownerInfo.username",
                             collaboratorIds: true,
                             collaboratorUsernames: "$collaboratorUsernames",
+                            viewerIds: true,
+                            viewerUsernames: "$viewerUsernames",
                         },
                     },
                     {
@@ -111,10 +136,15 @@ export function canvasRouter() {
                             username: canvas.ownerUsername,
                         },
                         is_owner: true,
+                        editable: true,
                         lastModifiedAt: canvas.lastModifiedAt,
                         collaborators: canvas.collaboratorIds.map((id, index) => ({
                             id: id.toHexString(),
                             username: canvas.collaboratorUsernames[index].username,
+                        })),
+                        viewers: canvas.viewerIds.map((id, index) => ({
+                            id: id.toHexString(),
+                            username: canvas.viewerUsernames[index].username,
                         })),
                     };
                 }
@@ -127,6 +157,7 @@ export function canvasRouter() {
                         username: canvas.ownerUsername,
                     },
                     is_owner: false,
+                    editable: canvas.collaboratorIds.some((id) => id.equals(userId)),
                     lastModifiedAt: canvas.lastModifiedAt,
                 };
             }),
@@ -148,6 +179,7 @@ export function canvasRouter() {
                 ownerId: userId,
                 lastModifiedAt: new Date(),
                 collaboratorIds: [],
+                viewerIds: [],
                 data: null,
             }),
         );
@@ -234,6 +266,7 @@ export function canvasRouter() {
                     $set: {
                         name: data.name,
                         collaboratorIds: data.collaboratorIds,
+                        viewerIds: data.viewerIds,
                         lastModifiedAt: new Date(),
                     },
                 },
@@ -259,7 +292,7 @@ export function canvasRouter() {
         const [canvas, findError] = await tryCatch(
             db.collection<CanvasDocument>(CANVAS_COLLECTION).findOne({
                 _id: new ObjectId(canvasId),
-                $or: [{ ownerId: userId }, { collaboratorIds: userId }],
+                $or: [{ ownerId: userId }, { collaboratorIds: userId }, { viewerIds: userId }],
             }),
         );
 
@@ -273,6 +306,7 @@ export function canvasRouter() {
         res.status(200).json({
             id: canvas._id.toHexString(),
             name: canvas.name,
+            editable: canvas.ownerId.equals(userId) || canvas.collaboratorIds.some((id) => id.equals(userId)),
             data: canvas.data,
         });
     });

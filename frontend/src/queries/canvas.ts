@@ -99,7 +99,7 @@ export const editCanvasDetailsMutationOptions = {
     mutationFn: editCanvasDetails,
 };
 
-async function editCanvasDetails(data: { id: string; name: string; collaboratorIds: string[] }) {
+async function editCanvasDetails(data: { id: string; name: string; collaboratorIds: string[], viewerIds: string[] }) {
     if (import.meta.env.DEV) return true;
 
     const [response, fetchErr] = await tryCatch(
@@ -108,7 +108,7 @@ async function editCanvasDetails(data: { id: string; name: string; collaboratorI
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ name: data.name, collaboratorIds: data.collaboratorIds }),
+            body: JSON.stringify({ name: data.name, collaboratorIds: data.collaboratorIds, viewerIds: data.viewerIds }),
         }),
     );
     if (fetchErr) throw fetchErr;

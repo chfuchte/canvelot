@@ -1,7 +1,7 @@
-import { gunzip } from "zlib";
 import getRawBody from "raw-body";
 import type { NextFunction, Request, Response } from "express";
 import { internalServerError, tryCatch } from "../lib/utils.js";
+import { gunzipAsync } from "../lib/gzip.js";
 
 export async function gzipMiddleware(req: Request, res: Response, next: NextFunction) {
     if (req.headers["content-encoding"] !== "gzip") {
@@ -10,7 +10,7 @@ export async function gzipMiddleware(req: Request, res: Response, next: NextFunc
 
     const raw = await getRawBody(req, {
         length: req.headers["content-length"],
-        limit: "25mb",
+        limit: "5mb",
     });
 
     const [unzipped, unzipError] = await tryCatch(gunzipAsync(raw));
@@ -29,13 +29,4 @@ export async function gzipMiddleware(req: Request, res: Response, next: NextFunc
     }
 
     next();
-}
-
-function gunzipAsync(buffer: Buffer): Promise<Buffer<ArrayBuffer>> {
-    return new Promise((resolve, reject) => {
-        gunzip(buffer, (err, result) => {
-            if (err) return reject(err);
-            resolve(result);
-        });
-    });
 }

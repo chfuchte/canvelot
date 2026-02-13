@@ -62,7 +62,7 @@ Viewer-Mode for sharing canvases without editing permissions.
 
 ### Fixed
 
-- N/A
+- [fix]: proper redirect after login to the originally requested page, enhancing user experience
 
 ### Security
 

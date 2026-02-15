@@ -42,6 +42,22 @@ export function getUserIdFromRequest(req: Request) {
     return userId;
 }
 
+export function getUserFromRequest(req: Request) {
+    const session = req.session;
+
+    if (!session) return null;
+
+    if (!ObjectId.isValid(session.user.id)) return null;
+
+    const userId = ObjectId.createFromHexString(session.user.id);
+
+    return {
+        id: userId,
+        username: session.user.username,
+        role: session.user.role,
+    };
+}
+
 export function isAsset(path: string) {
     return path.startsWith("/assets/") || path.startsWith("/favicon") || path.startsWith("/robots.txt");
 }

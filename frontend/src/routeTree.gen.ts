@@ -10,11 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ManageUsersRouteImport } from './routes/manage/users'
+import { Route as ManageCanvasRouteImport } from './routes/manage/canvas'
 import { Route as CanvasCanvasIdRouteImport } from './routes/canvas/$canvasId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManageUsersRoute = ManageUsersRouteImport.update({
+  id: '/manage/users',
+  path: '/manage/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManageCanvasRoute = ManageCanvasRouteImport.update({
+  id: '/manage/canvas',
+  path: '/manage/canvas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CanvasCanvasIdRoute = CanvasCanvasIdRouteImport.update({
@@ -26,27 +38,40 @@ const CanvasCanvasIdRoute = CanvasCanvasIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/canvas/$canvasId': typeof CanvasCanvasIdRoute
+  '/manage/canvas': typeof ManageCanvasRoute
+  '/manage/users': typeof ManageUsersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/canvas/$canvasId': typeof CanvasCanvasIdRoute
+  '/manage/canvas': typeof ManageCanvasRoute
+  '/manage/users': typeof ManageUsersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/canvas/$canvasId': typeof CanvasCanvasIdRoute
+  '/manage/canvas': typeof ManageCanvasRoute
+  '/manage/users': typeof ManageUsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/canvas/$canvasId'
+  fullPaths: '/' | '/canvas/$canvasId' | '/manage/canvas' | '/manage/users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/canvas/$canvasId'
-  id: '__root__' | '/' | '/canvas/$canvasId'
+  to: '/' | '/canvas/$canvasId' | '/manage/canvas' | '/manage/users'
+  id:
+    | '__root__'
+    | '/'
+    | '/canvas/$canvasId'
+    | '/manage/canvas'
+    | '/manage/users'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CanvasCanvasIdRoute: typeof CanvasCanvasIdRoute
+  ManageCanvasRoute: typeof ManageCanvasRoute
+  ManageUsersRoute: typeof ManageUsersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -56,6 +81,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manage/users': {
+      id: '/manage/users'
+      path: '/manage/users'
+      fullPath: '/manage/users'
+      preLoaderRoute: typeof ManageUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manage/canvas': {
+      id: '/manage/canvas'
+      path: '/manage/canvas'
+      fullPath: '/manage/canvas'
+      preLoaderRoute: typeof ManageCanvasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/canvas/$canvasId': {
@@ -71,6 +110,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CanvasCanvasIdRoute: CanvasCanvasIdRoute,
+  ManageCanvasRoute: ManageCanvasRoute,
+  ManageUsersRoute: ManageUsersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

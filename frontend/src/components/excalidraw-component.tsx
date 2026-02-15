@@ -65,7 +65,14 @@ export function ExcalidrawComponent({ canvas }: { canvas: Canvas }) {
     const reloadOldState = () => {
         if (!canvas.data) return;
 
-        const restoredAppState = restoreAppState(canvas.data?.appState, excalidrawAPI?.getAppState());
+        const restoredAppState = restoreAppState(
+            {
+                ...canvas.data?.appState,
+                name: canvas.name,
+                theme: theme,
+            },
+            excalidrawAPI?.getAppState(),
+        );
 
         const restoredElements = restoreElements(canvas.data?.elements || [], []);
         return {

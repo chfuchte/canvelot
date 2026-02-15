@@ -5,9 +5,17 @@ import { ButtonGroup } from "./ui/button-group";
 import { GitHubIcon } from "./icons/github";
 import { CanvelotIcon } from "./icons/canvelot";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getIsAdminQueryOptions } from "@/queries/management";
+import { Separator } from "./ui/separator";
 
 export function Footer() {
+    const { data: isAdmin, isLoading, isError, error } = useQuery(getIsAdminQueryOptions);
     const { theme, setTheme } = useTheme();
+
+    if (isError) {
+        console.error("Error fetching admin status:", error);
+    }
 
     return (
         <footer className="bg-muted text-muted-foreground flex flex-col items-center gap-2 p-4 text-sm">
@@ -33,7 +41,22 @@ export function Footer() {
                 </Button>
             </ButtonGroup>
 
-            <div>&copy; {new Date().getFullYear()} Christian Fuchte. All rights reserved.</div>
+            {isLoading ? (
+                <div className="text-muted-foreground">Loading admin status...</div>
+            ) : isError ? (
+                <div className="text-destructive">Failed to load admin status.</div>
+            ) : isAdmin ? (
+                <div className="flex flex-row items-center gap-2">
+                    <Link to="/manage/canvas">Manage Canvases</Link>
+                    <Separator orientation="vertical" className="h-4" />
+                    <Link to="/manage/users">Manage Users</Link>
+                </div>
+            ) : null}
+
+            <div>&copy; {new Date().getFullYear()} Christian Fuchte</div>
+            <div>
+                v{__APP_VERSION__} ({__BUILD_DATE__})
+            </div>
         </footer>
     );
 }

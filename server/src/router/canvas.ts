@@ -304,12 +304,20 @@ export function canvasRouter() {
 
         if (!canvas) return notFound(res);
 
-        const [zipped, zipError] = await tryCatch(gzipAsync(Buffer.from(JSON.stringify({
-            id: canvas._id.toHexString(),
-            name: canvas.name,
-            editable: canvas.collaboratorIds.some((id) => id.equals(userId)) || canvas.ownerId.equals(userId),
-            data: canvas.data,
-        }), "utf-8")));
+        const [zipped, zipError] = await tryCatch(
+            gzipAsync(
+                Buffer.from(
+                    JSON.stringify({
+                        id: canvas._id.toHexString(),
+                        name: canvas.name,
+                        editable:
+                            canvas.collaboratorIds.some((id) => id.equals(userId)) || canvas.ownerId.equals(userId),
+                        data: canvas.data,
+                    }),
+                    "utf-8",
+                ),
+            ),
+        );
 
         if (zipError) {
             log("error", `Failed to gzip canvas data: ${JSON.stringify(zipError)}`);

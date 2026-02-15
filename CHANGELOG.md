@@ -69,3 +69,33 @@ Viewer-Mode for sharing canvases without editing permissions.
 - N/A
 
 [0.2.0]: https://github.com/chfuchte/canvelot/releases/tag/0.2.0
+
+## [0.3.0] - 2026-02-15
+
+Admin panel for user management and canvas oversight.
+
+### Added
+
+- [feat]: admin panel for managing users and overseeing canvas activities, including user roles and permissions
+
+### Changed
+
+- [feat]: compressed response of canvas fetch to reduce bandwidth usage and improve performance
+
+### Deprecated
+
+- N/A
+
+### Removed
+
+- N/A
+
+### Fixed
+
+- N/A
+
+### Security
+
+- dependency updates
+
+[0.3.0]: https://github.com/chfuchte/canvelot/releases/tag/0.3.0

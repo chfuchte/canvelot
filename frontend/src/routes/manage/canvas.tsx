@@ -8,15 +8,7 @@ import { ErrorComponent } from "@/components/error";
 import { useEffect } from "react";
 import { LoadingSpinner } from "@/components/loading";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DeleteCanvasManagementDialog } from "@/components/dialogs/delete-canvas-management-dialog";
 import { Button } from "@/components/ui/button";
 import { lastModifiedAtToRelativeTime } from "@/lib/utils";

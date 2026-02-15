@@ -11,7 +11,7 @@ export const canvasesSchema = z.array(
 
 export type ManagementCanvasList = z.infer<typeof canvasesSchema>;
 
-export const usersSchema= z.array(
+export const usersSchema = z.array(
     z.object({
         id: z.string(),
         name: z.string(),

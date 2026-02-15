@@ -13,7 +13,7 @@ export async function fetchIsAdmin() {
     if (import.meta.env.DEV) return true;
 
     const [response, fetchErr] = await tryCatch(
-        fetch(`${__API_URL__}/api/management/is-current-user-admin`, {
+        fetch(`${__API_URL__}/api/authentication/is-current-user-admin`, {
             method: "GET",
         }),
     );

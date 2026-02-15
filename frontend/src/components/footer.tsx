@@ -53,7 +53,10 @@ export function Footer() {
                 </div>
             ) : null}
 
-            <div>&copy; {new Date().getFullYear()} Christian Fuchte. All rights reserved.</div>
+            <div>&copy; {new Date().getFullYear()} Christian Fuchte</div>
+            <div>
+                v{__APP_VERSION__} ({__BUILD_DATE__})
+            </div>
         </footer>
     );
 }

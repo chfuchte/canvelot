@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { internalServerError, tryCatch, unauthorized } from "../lib/utils.js";
+import { getUserFromRequest, internalServerError, tryCatch, unauthorized } from "../lib/utils.js";
 import { logger } from "../lib/logger.js";
 import { auth } from "../lib/auth.js";
 import { fromNodeHeaders } from "better-auth/node";
@@ -12,6 +12,13 @@ const log = logger({
 
 export function authenticationRouter() {
     const router = Router();
+
+    router.get("/is-current-user-admin", async (req, res) => {
+        const user = getUserFromRequest(req);
+        if (!user) return unauthorized(res);
+
+        return res.status(200).json({ isAdmin: user.role === "admin" });
+    });
 
     router.get("/logout", async (req, res) => {
         const [success, error] = await tryCatch(

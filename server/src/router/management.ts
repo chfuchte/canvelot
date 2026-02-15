@@ -21,13 +21,6 @@ const log = logger({
 export function managementRouter() {
     const router = Router();
 
-    router.get("/is-current-user-admin", async (req, res) => {
-        const user = getUserFromRequest(req);
-        if (!user) return unauthorized(res);
-
-        return res.status(200).json({ isAdmin: user.role === "admin" });
-    });
-
     router.get("/users", async (req, res) => {
         const user = getUserFromRequest(req);
         if (!user) return unauthorized(res);
@@ -132,7 +125,7 @@ export function managementRouter() {
                 id: canvas._id.toHexString(),
                 name: canvas.name,
                 lastModifiedAt: canvas.lastModifiedAt,
-                owner: canvas.owner,
+                owner: canvas.owner.username,
             })),
         );
     });

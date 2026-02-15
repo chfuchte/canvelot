@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { tryCatch } from "@/lib/utils";
 import { canvasCreateSchema, canvasListSchema, canvasSchema, type CanvasList } from "@/types/canvas";
 import { mockCanvas, mockCanvasList } from "@/mocks/canvas";
-import { gzip } from "pako";
+import { gzip, ungzip } from "pako";
 
 export const fetchCanvasListQueryOptions = queryOptions({
     queryKey: ["canvas-list"],
@@ -139,9 +139,20 @@ async function fetchCanvas(id: string) {
 
     if (!response.ok) throw new Error("Failed to fetch canvas");
 
-    const [json, jsonErr] = await tryCatch(response.json());
-    if (jsonErr) {
-        throw jsonErr;
+    const [arrayBuffer, arrayBufferErr] = await tryCatch(response.arrayBuffer());
+    if (arrayBufferErr) {
+        throw arrayBufferErr;
+    }
+
+    let json: unknown;
+
+    try {
+        const decompressed = ungzip(arrayBuffer);
+        const decoder = new TextDecoder("utf-8");
+        const jsonStr = decoder.decode(decompressed);
+        json = JSON.parse(jsonStr);
+    } catch (err) {
+        throw new Error("Failed to decompress canvas data");
     }
 
     const { data, success, error } = canvasSchema.safeParse(json);

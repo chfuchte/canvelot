@@ -31,7 +31,7 @@ app.use(
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(gzipMiddleware);
-app.use(express.json({ limit: "25mb" }));
+app.use(express.json({ limit: "5mb" }));
 
 app.use(authMiddleware);
 

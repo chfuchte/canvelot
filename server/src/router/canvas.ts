@@ -12,6 +12,7 @@ import {
 } from "../lib/utils.js";
 import { logger } from "../lib/logger.js";
 import { canvasDataSchema, createCanvasSchema, updateCanvasDetailsSchema } from "../schema/canvas.js";
+import { gzipAsync } from "../lib/gzip.js";
 
 const log = logger({
     name: "router.canvas",
@@ -303,12 +304,14 @@ export function canvasRouter() {
 
         if (!canvas) return notFound(res);
 
-        res.status(200).json({
-            id: canvas._id.toHexString(),
-            name: canvas.name,
-            editable: canvas.ownerId.equals(userId) || canvas.collaboratorIds.some((id) => id.equals(userId)),
-            data: canvas.data,
-        });
+        const [zipped, zipError] = await tryCatch(gzipAsync(Buffer.from(JSON.stringify(canvas.data), "utf-8")));
+
+        if (zipError) {
+            log("error", `Failed to gzip canvas data: ${JSON.stringify(zipError)}`);
+            return internalServerError(res);
+        }
+
+        res.status(200).set("Content-Encoding", "gzip").send(zipped);
     });
 
     router.put("/data/:id", async (req, res) => {

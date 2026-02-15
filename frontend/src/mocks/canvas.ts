@@ -1,4 +1,5 @@
 import type { Canvas, CanvasList, UserSelection } from "@/types/canvas";
+import type { ManagementCanvasList } from "@/types/management";
 
 export const mockCanvasList: CanvasList = [
     {
@@ -67,3 +68,10 @@ export const mockCanvas: Canvas = {
     editable: true,
     data: null,
 };
+
+export const mockManagementCanvasList: ManagementCanvasList = mockCanvasList.map((canvas) => ({
+    id: canvas.id,
+    name: canvas.name,
+    lastModifiedAt: canvas.lastModifiedAt.toISOString(),
+    owner: canvas.owner.username,
+}));

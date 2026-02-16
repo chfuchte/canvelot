@@ -1,7 +1,7 @@
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { getCanvasesQueryOptions, fetchIsAdmin } from "@/queries/management";
 import { useManagementStore } from "@/stores/management";
 import { ErrorComponent } from "@/components/error";
@@ -13,6 +13,7 @@ import { DeleteCanvasManagementDialog } from "@/components/dialogs/delete-canvas
 import { Button } from "@/components/ui/button";
 import { lastModifiedAtToRelativeTime } from "@/lib/utils";
 import { Trash } from "lucide-react";
+import { Chip } from "@/components/ui/chip";
 
 export const Route = createFileRoute("/manage/canvas")({
     component: RouteComponent,
@@ -72,7 +73,11 @@ function RouteComponent() {
                             {list.map((canvas) => (
                                 <TableRow key={canvas.id}>
                                     <TableCell>{canvas.name}</TableCell>
-                                    <TableCell>{canvas.owner}</TableCell>
+                                    <TableCell>
+                                        <Link to="/manage/users">
+                                            <Chip>{canvas.owner}</Chip>
+                                        </Link>
+                                    </TableCell>
                                     <TableCell>{lastModifiedAtToRelativeTime(canvas.lastModifiedAt)}</TableCell>
                                     <TableCell>
                                         <DeleteCanvasManagementDialog id={canvas.id} name={canvas.name}>

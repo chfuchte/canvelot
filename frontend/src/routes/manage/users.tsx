@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { DeleteUserManagementDialog } from "@/components/dialogs/delete-user-management-dialog";
 import { ToggleUserRoleManagementDialog } from "@/components/dialogs/toggle-role-dialog";
 import { Trash, UserStar, UserX } from "lucide-react";
+import { Chip } from "@/components/ui/chip";
 
 export const Route = createFileRoute("/manage/users")({
     component: RouteComponent,
@@ -72,7 +73,9 @@ function RouteComponent() {
                                 <TableRow key={user.id}>
                                     <TableCell>{user.username}</TableCell>
                                     <TableCell>{user.name}</TableCell>
-                                    <TableCell>{user.role}</TableCell>
+                                    <TableCell>
+                                        <Chip>{user.role}</Chip>
+                                    </TableCell>
                                     <TableCell className="space-x-2">
                                         <ToggleUserRoleManagementDialog
                                             id={user.id}

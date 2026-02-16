@@ -99,3 +99,33 @@ Admin panel for user management and canvas oversight.
 - dependency updates
 
 [0.3.0]: https://github.com/chfuchte/canvelot/releases/tag/0.3.0
+
+## [0.3.1] - 2026-02-16
+
+UI fixes and dependency updates.
+
+### Added
+
+- N/A
+
+### Changed
+
+- [feat]: /manage/canvas route now links the owner to the /manage/users page for easier user management
+
+### Deprecated
+
+- N/A
+
+### Removed
+
+- N/A
+
+### Fixed
+
+- [fix]: canvelot version is now displayed in the footer of the application
+
+### Security
+
+- dependency updates
+
+[0.3.1]: https://github.com/chfuchte/canvelot/releases/tag/0.3.1

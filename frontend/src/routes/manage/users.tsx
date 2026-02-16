@@ -61,9 +61,9 @@ function RouteComponent() {
                         <TableCaption>List of all users</TableCaption>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Owner</TableHead>
-                                <TableHead>Last Modified At</TableHead>
+                                <TableHead>Username</TableHead>
+                                <TableHead>Full Name</TableHead>
+                                <TableHead>Role</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>

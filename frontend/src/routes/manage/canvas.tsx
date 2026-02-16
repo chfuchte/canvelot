@@ -64,7 +64,7 @@ function RouteComponent() {
                             <TableRow>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Owner</TableHead>
-                                <TableHead>Last Modified At</TableHead>
+                                <TableHead>Last Modified</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>

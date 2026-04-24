@@ -10,7 +10,7 @@
         "format": "prettier --write ."
     },
     "dependencies": {
-        "@excalidraw/excalidraw": "^0.18.0",
+        "@excalidraw/excalidraw": "^0.18.1",
         "@fontsource-variable/nunito-sans": "^5.2.7",
         "@tanstack/react-form": "^1.28.6",
         "@tanstack/react-query": "^5.97.0",

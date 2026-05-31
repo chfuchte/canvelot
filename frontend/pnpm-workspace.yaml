@@ -1,5 +1,6 @@
 allowBuilds:
-  msw: set this to true or false
+    msw: true
+    esbuild: true
 onlyBuiltDependencies:
-  - esbuild
-  - msw
+    - esbuild
+    - msw

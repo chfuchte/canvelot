@@ -10,14 +10,14 @@ WORKDIR /app
 
 COPY frontend/package.json frontend/pnpm-lock.yaml* ./
 
-RUN pnpm i --frozen-lockfile;
+RUN pnpm i --frozen-lockfile --allow-scripts;
 
 FROM deps AS server_deps
 WORKDIR /app
 
 COPY server/package.json server/pnpm-lock.yaml* ./
 
-RUN pnpm i --frozen-lockfile;
+RUN pnpm i --frozen-lockfile --allow-scripts;
 
 FROM base AS frontend_build
 WORKDIR /app

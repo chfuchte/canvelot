@@ -129,3 +129,33 @@ UI fixes and dependency updates.
 - dependency updates
 
 [0.3.1]: https://github.com/chfuchte/canvelot/releases/tag/0.3.1
+
+## [0.3.2] - 2026-05-31
+
+Dependency updates.
+
+### Added
+
+- N/A
+
+### Changed
+
+- N/A
+
+### Deprecated
+
+- N/A
+
+### Removed
+
+- N/A
+
+### Fixed
+
+- N/A
+
+### Security
+
+- dependency updates
+
+[0.3.2]: https://github.com/chfuchte/canvelot/releases/tag/0.3.2

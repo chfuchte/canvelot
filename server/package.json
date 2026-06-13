@@ -12,10 +12,10 @@
         "format": "prettier --write ."
     },
     "dependencies": {
-        "better-auth": "^1.6.12",
+        "better-auth": "^1.6.17",
         "cors": "^2.8.6",
         "express": "^5.2.1",
-        "mongodb": "^7.2.0",
+        "mongodb": "^7.3.0",
         "raw-body": "^3.0.2",
         "zlib": "^1.0.5",
         "zod": "^4.4.3"
@@ -24,9 +24,9 @@
         "@excalidraw/excalidraw": "^0.18.1",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.6",
-        "@types/node": "^25.9.1",
+        "@types/node": "^25.9.3",
         "esbuild": "^0.28.1",
-        "prettier": "^3.8.3",
+        "prettier": "^3.8.4",
         "typescript": "^6.0.3"
     }
 }

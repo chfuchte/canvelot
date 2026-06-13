@@ -30,7 +30,7 @@ updates:
     - package-ecosystem: "npm"
       directory: "/frontend"
       schedule:
-          interval: "weekly"
+          interval: "monthly"
       labels:
           - "dependencies"
       open-pull-requests-limit: 5
@@ -42,7 +42,7 @@ updates:
     - package-ecosystem: "npm"
       directory: "/server"
       schedule:
-          interval: "weekly"
+          interval: "monthly"
       labels:
           - "dependencies"
       open-pull-requests-limit: 5
